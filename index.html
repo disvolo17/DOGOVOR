@@ -2,148 +2,102 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Редактор Договора РЦ Зарождение</title>
+    <title>Редактор Договора (Полная копия из файла)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     <style>
-        :root {
-            --sidebar-width: 400px;
-            --bg-color: #2c3e50;
-        }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Times New Roman", serif; background: var(--bg-color); display: flex; }
-
-        /* ИНТЕРФЕЙС РЕДАКТОРА */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #1a252f;
-            color: white;
-            padding: 20px;
-            height: 100vh;
-            overflow-y: auto;
-            position: fixed;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
-        }
-        .sidebar h2 { font-size: 1.2rem; color: #f1c40f; border-bottom: 1px solid #34495e; padding-bottom: 10px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; color: #95a5a6; margin-bottom: 5px; text-transform: uppercase; }
-        input, textarea {
-            width: 100%; padding: 10px; background: #34495e; border: 1px solid #2c3e50;
-            color: white; border-radius: 4px; font-family: sans-serif;
-        }
-        .print-btn {
-            width: 100%; padding: 15px; background: #e74c3c; color: white; border: none;
-            border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        @media screen {
+            body { background: #2c3e50; display: flex; margin: 0; font-family: sans-serif; }
+            .sidebar { width: 400px; background: #1a252f; color: white; padding: 20px; height: 100vh; overflow-y: auto; position: fixed; }
+            .content { margin-left: 400px; padding: 40px; background: #525659; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .input-group { margin-bottom: 15px; }
+            input, textarea { width: 100%; padding: 8px; background: #34495e; border: 1px solid #2c3e50; color: white; border-radius: 4px; }
+            .print-btn { width: 100%; padding: 15px; background: #e74c3c; color: white; border: none; cursor: pointer; font-weight: bold; }
         }
 
-        /* ПРЕДПРОСМОТР ДОКУМЕНТА */
-        .preview {
-            margin-left: var(--sidebar-width);
-            padding: 40px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .page {
+        .page-wrap {
             width: 210mm;
-            min-height: 297mm;
             background: white;
-            padding: 20mm 15mm 20mm 25mm; /* ГОСТ отступы */
-            margin-bottom: 30px;
+            padding: 20mm 15mm 20mm 25mm;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            color: black;
+            font-family: "Times New Roman", Times, serif;
             font-size: 12pt;
             line-height: 1.3;
-            position: relative;
+            color: black;
         }
 
-        /* ТИПОГРАФИКА WORD */
-        h1, h2 { font-size: 13pt; text-align: center; text-transform: uppercase; margin: 15px 0; }
-        p { margin: 0 0 10px 0; text-align: justify; text-indent: 1.25cm; }
-        .no-indent { text-indent: 0; }
-        .right { text-align: right; text-indent: 0; }
-        .center { text-align: center; text-indent: 0; font-weight: bold; }
-        .val { font-weight: bold; text-decoration: underline; background: #fffde7; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        td { border: 1px solid black; padding: 10px; vertical-align: top; font-size: 10pt; text-indent: 0; }
+        /* Убираем отступы Mammoth для чистоты */
+        #contract-body p { text-align: justify; margin-bottom: 10px; }
+        .highlight { background: #fffde7; font-weight: bold; border-bottom: 1px solid #000; }
 
         @media print {
             .sidebar { display: none; }
-            .preview { margin-left: 0; padding: 0; background: white; }
-            .page { 
-                box-shadow: none; margin: 0; width: 100%; 
-                page-break-after: always; /* Каждый лист отдельно */
-            }
-            .val { background: transparent; }
+            .content { margin: 0; padding: 0; background: white; }
+            .page-wrap { box-shadow: none; width: 100%; }
+            .highlight { background: transparent; }
         }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>РЕДАКТИРОВАНИЕ</h2>
-    <div class="input-group"><label>Договор №</label><input type="text" id="in_num" value="315" oninput="sync()"></div>
-    <div class="input-group"><label>Дата</label><input type="text" id="in_date" value="15 Апреля 2026" oninput="sync()"></div>
+    <h2>ДАННЫЕ ДЛЯ ЗАМЕНЫ</h2>
+    <p style="font-size: 0.8rem; color: #bdc3c7;">Введите данные точно так же, как они написаны в шаблоне файла, чтобы программа их нашла.</p>
     
-    <h2>ЗАКАЗЧИК</h2>
-    <div class="input-group"><label>ФИО</label><input type="text" id="in_z_fio" value="Линников Владимир Николаевич" oninput="sync()"></div>
-    <div class="input-group"><label>Паспорт/Адрес</label><textarea id="in_z_data" rows="4" oninput="sync()">паспорт серия 0000 № 000000, выдан ОВД г. Москвы. Адрес: г. Москва, ул. Центральная, д.1</textarea></div>
-
-    <h2>ПОТРЕБИТЕЛЬ</h2>
-    <div class="input-group"><label>ФИО</label><input type="text" id="in_p_fio" value="Линников Юрий Владимирович" oninput="sync()"></div>
-    <div class="input-group"><label>Паспорт/Адрес</label><textarea id="in_p_data" rows="4" oninput="sync()">паспорт серия 1111 № 111111. Адрес: г. Москва...</textarea></div>
-
-    <h2>ДЕНЬГИ</h2>
-    <div class="input-group"><label>Сумма</label><input type="text" id="in_sum" value="60 000 (шестьдесят тысяч)" oninput="sync()"></div>
-    
-    <button class="print-btn" onclick="window.print()">ПЕЧАТЬ PDF (13 СТР.)</button>
-</div>
-
-<div class="preview" id="contract-view">
-    <div class="page">
-        <div class="center">Договор № <span class="val" id="v_num">315</span><br>на оказание услуг</div>
-        <div style="display: flex; justify-content: space-between;" class="no-indent">
-            <span>дер. Марьино</span>
-            <span>«<span class="val" id="v_date">15 Апреля 2026</span>» г.</span>
-        </div>
-        <br>
-        <p><b>Общество с ограниченной ответственностью «НОВЫЙ ВЗГЛЯД»</b>, именуемое в дальнейшем «Исполнитель», в лице Генерального директора Жукова Дмитрия Вячеславовича, действующего на основании Устава, с одной стороны, и <b>Гражданин РФ <span class="val" id="v_z_fio">Линников Владимир Николаевич</span></b>, именуемый в дальнейшем «Заказчик», с другой стороны, и <b>Гражданин РФ <span class="val" id="v_p_fio">Линников Юрий Владимирович</span></b>, именуемый в дальнейшем «Потребитель», далее совместно именуемые «Стороны», находясь в здравом уме, осуществляя свои права своей волей, понимая значение и последствия совершаемой сделки, при отсутствии в отношении нас насилия, угроз и принуждения... заключили настоящий договор о нижеследующем:</p>
-        
-        <div class="center">ОПРЕДЕЛЕНИЯ, ИСПОЛЬЗУЕМЫЕ В ДОГОВОРЕ</div>
-        <p><b>Социальная реабилитация</b> – курс (программа) активного приспособления Потребителя (зависимого) к принятым в обществе правилам и нормам поведения...</p>
-        <p><b>ООО «НОВЫЙ ВЗГЛЯД»</b> – Реабилитационный центр “Зарождение”, расположенный по адресу: Московская область, Солнечногорский р-он, дер. Марьино, д. 76.</p>
-        
-        <div class="center">1. ПРЕДМЕТ ДОГОВОРА</div>
-        <p>1.1. Исполнитель предоставляет, а Заказчик оплачивает услуги по социальной реабилитации Потребителя в РЦ «Зарождение»...</p>
+    <div class="input-group">
+        <label>Заменить "Линников Владимир Николаевич" на:</label>
+        <input type="text" id="z_fio" value="Иванов Иван Иванович">
     </div>
 
-    <div id="dynamic-pages"></div>
+    <div class="input-group">
+        <label>Заменить "Линников Юрий Владимирович" на:</label>
+        <input type="text" id="p_fio" value="Иванов Петр Иванович">
+    </div>
+
+    <div class="input-group">
+        <label>Номер договора (вместо 315):</label>
+        <input type="text" id="doc_num" value="500">
+    </div>
+
+    <button class="print-btn" onclick="processFile()">1. ОБНОВИТЬ ТЕКСТ</button>
+    <button class="print-btn" style="background:#27ae60; margin-top:10px;" onclick="window.print()">2. ПЕЧАТЬ PDF</button>
+</div>
+
+<div class="content">
+    <div class="page-wrap" id="contract-body">
+        Загрузка оригинального текста из dogovor.docx...
+    </div>
 </div>
 
 <script>
-    function sync() {
-        const val = (id) => document.getElementById('in_' + id).value;
-        const set = (id, text) => {
-            document.querySelectorAll('#' + id).forEach(el => el.innerText = text);
-        };
-
-        set('v_num', val('num'));
-        set('v_date', val('date'));
-        set('v_z_fio', val('z_fio'));
-        set('v_p_fio', val('p_fio'));
+    // Функция загрузки и обработки файла
+    async function processFile() {
+        const response = await fetch('dogovor.docx'); // Файл должен лежать в той же папке на GitHub
+        const arrayBuffer = await response.arrayBuffer();
         
-        // Обновление подписей в приложениях
-        const shortFio = (name) => {
-            const p = name.split(' ');
-            return p.length >= 3 ? `${p[0]} ${p[1][0]}.${p[2][0]}.` : name;
-        };
-        set('v_z_init', shortFio(val('z_fio')));
-        set('v_p_init', shortFio(val('p_fio')));
+        mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+            .then(function(result) {
+                let html = result.value; // Это ВЕСЬ текст из вашего Word без сокращений
+                
+                // Выполняем замены
+                const zFio = document.getElementById('z_fio').value;
+                const pFio = document.getElementById('p_fio').value;
+                const num = document.getElementById('doc_num').value;
+
+                // Заменяем оригинальные данные из вашего файла на новые
+                html = html.replace(/Линников Владимир Николаевич/g, `<span class="highlight">${zFio}</span>`);
+                html = html.replace(/Линников Юрий Владимирович/g, `<span class="highlight">${pFio}</span>`);
+                html = html.replace(/315/g, `<span class="highlight">${num}</span>`);
+                
+                document.getElementById('contract-body').innerHTML = html;
+            })
+            .catch(function(err) {
+                document.getElementById('contract-body').innerHTML = "Ошибка: Убедитесь, что файл dogovor.docx загружен в репозиторий GitHub.";
+                console.error(err);
+            });
     }
 
-    // Эта функция имитирует наличие всех 13 страниц, 
-    // разделяя текст на блоки page-break.
-    window.onload = sync;
+    // Загружаем при старте
+    window.onload = processFile;
 </script>
 </body>
 </html>
