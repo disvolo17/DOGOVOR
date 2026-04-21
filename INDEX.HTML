@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Юридически точный редактор: Договор РЦ Зарождение</title>
+    <style>
+        /* Настройки для экрана */
+        body { font-family: "Times New Roman", serif; background: #333; margin: 0; display: flex; }
+        .sidebar { width: 450px; background: #1e1e1e; color: #efefef; padding: 25px; height: 100vh; overflow-y: auto; position: fixed; box-shadow: 5px 0 15px rgba(0,0,0,0.5); z-index: 10; }
+        .sidebar h2 { font-size: 16px; color: #ffcc00; text-transform: uppercase; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 10px; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        input:focus { border-color: #ffcc00; outline: none; }
+        
+        /* Настройки документа */
+        .page-container { margin-left: 450px; padding: 50px; width: 100%; display: flex; flex-direction: column; align-items: center; background: #525659; }
+        .document-page { 
+            width: 210mm; 
+            min-height: 297mm; 
+            background: white; 
+            padding: 20mm 15mm 20mm 25mm; /* Стандартные ГОСТ отступы */
+            margin-bottom: 30px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.4); 
+            box-sizing: border-box; 
+            color: black; 
+            line-height: 1.15; 
+            font-size: 14px; 
+        }
+        
+        /* Типографика как в Word */
+        p { margin: 0 0 10px 0; text-align: justify; text-indent: 1.25cm; }
+        .no-indent { text-indent: 0; }
+        .center { text-align: center; font-weight: bold; margin: 15px 0; text-indent: 0; }
+        .right { text-align: right; text-indent: 0; }
+        .val { font-weight: bold; background: #fff2cc; border-bottom: 1px solid #000; padding: 0 2px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        table, td { border: 1px solid black; }
+        td { padding: 8px; vertical-align: top; font-size: 12px; line-height: 1.2; text-indent: 0; }
+
+        .print-btn { position: fixed; bottom: 30px; right: 30px; background: #c00; color: white; border: none; padding: 20px 40px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); transition: 0.3s; }
+        .print-btn:hover { background: #e00; transform: scale(1.05); }
+
+        @media print {
+            .sidebar, .print-btn { display: none !important; }
+            .page-container { margin-left: 0; padding: 0; background: none; }
+            .document-page { box-shadow: none; margin: 0; width: 100%; page-break-after: always; }
+            .val { background: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>ПАНЕЛЬ ЗАПОЛНЕНИЯ</h2>
+    <div class="input-group"><label>Номер договора</label><input type="text" id="in_num" value="315" oninput="update()"></div>
+    <div class="input-group">
+        <label>Дата подписания</label>
+        <div style="display:flex; gap:5px;">
+            <input type="text" id="in_day" value="15" oninput="update()" style="width:25%">
+            <input type="text" id="in_month" value="Апреля" oninput="update()" style="width:45%">
+            <input type="text" id="in_year" value="2026" oninput="update()" style="width:30%">
+        </div>
+    </div>
+
+    <div class="input-group"><label>Заказчик (ФИО полностью)</label><input type="text" id="in_z_fio" value="Линников Владимир Николаевич" oninput="update()"></div>
+    <div class="input-group"><label>Паспорт и адрес Заказчика</label><textarea id="in_z_data" rows="4" oninput="update()">паспорт серия 0000 № 000000, выдан ОВД г. Москвы, адрес: г. Москва...</textarea></div>
+
+    <div class="input-group"><label>Потребитель (ФИО полностью)</label><input type="text" id="in_p_fio" value="Линников Юрий Владимирович" oninput="update()"></div>
+    <div class="input-group"><label>Паспорт и адрес Потребителя</label><textarea id="in_p_data" rows="4" oninput="update()">паспорт серия 1111 № 111111, адрес: г. Москва...</textarea></div>
+
+    <div class="input-group"><label>Сумма цифрами</label><input type="text" id="in_sum" value="60 000" oninput="update()"></div>
+    <div class="input-group"><label>Сумма прописью</label><input type="text" id="in_sum_txt" value="шестьдесят тысяч" oninput="update()"></div>
+</div>
+
+<button class="print-btn" onclick="window.print()">ПЕЧАТЬ (ВСЕ СТРАНИЦЫ)</button>
+
+<div class="page-container">
+    <div class="document-page">
+        <div class="center">Договор № <span class="val" id="v_num">315</span><br>на оказание услуг</div>
+        <div style="display: flex; justify-content: space-between;" class="no-indent">
+            <span>дер. Марьино</span>
+            <span>«<span class="val" id="v_day">15</span>» <span class="val" id="v_month">Апреля</span> <span class="val" id="v_year">2026</span> г.</span>
+        </div>
+        
+        <p style="margin-top:20px;"><b>Общество с ограниченной ответственностью «НОВЫЙ ВЗГЛЯД»</b>, именуемое в дальнейшем «Исполнитель», в лице Генерального директора Жукова Дмитрия Вячеславовича, действующего на основании Устава, с одной стороны, и <b>Гражданин РФ <span class="val" id="v_z_fio">Линников Владимир Николаевич</span></b>, именуемый в дальнейшем «Заказчик», с другой стороны, и <b>Гражданин РФ <span class="val" id="v_p_fio">Линников Юрий Владимирович</span></b>, именуемый в дальнейшем «Потребитель», заключили настоящий договор...</p>
+
+        <div class="center">ОПРЕДЕЛЕНИЯ, ИСПОЛЬЗУЕМЫЕ В ДОГОВОРЕ</div>
+        <p><b>Социальная реабилитация</b> – курс (программа) активного приспособления Потребителя...</p>
+        <p><i>(Здесь и далее в рабочем коде — полные 13 страниц текста из вашего файла)</i></p>
+        
+        <div class="center">1. ПРЕДМЕТ ДОГОВОРА</div>
+        <p>1.1. Исполнитель предоставляет, а Заказчик оплачивает услуги по социальной реабилитации...</p>
+    </div>
+
+    <div class="document-page">
+        <div class="center">12. ЮРИДИЧЕСКИЕ АДРЕСА И РЕКВИЗИТЫ СТОРОН</div>
+        <table>
+            <tr>
+                <td width="33%"><b>ИСПОЛНИТЕЛЬ</b><br>ООО «НОВЫЙ ВЗГЛЯД»<br>ИНН 5044111354<br>дер. Марьино, д. 76</td>
+                <td width="33%"><b>ЗАКАЗЧИК</b><br><span class="val" id="v_z_fio_sig">Линников В.Н.</span><br><span id="v_z_data_sig">...</span></td>
+                <td width="33%"><b>ПОТРЕБИТЕЛЬ</b><br><span class="val" id="v_p_fio_sig">Линников Ю.В.</span><br><span id="v_p_data_sig">...</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="document-page">
+        <div class="right">Приложение №3 к Договору № <span class="val" id="v_num_a3">315</span></div>
+        <div class="center">ДОБРОВОЛЬНОЕ СОГЛАСИЕ<br>на временное ограничение прав и свобод</div>
+        <p>Я, <b><span class="val" id="v_p_fio_consent">Линников Юрий Владимирович</span></b>, находясь в здравом уме и трезвой памяти, добровольно соглашаюсь на временное ограничение моих прав и свобод: свободу передвижения, тайну переписки, телефонных переговоров...</p>
+        <p>Мне известно, что Заказчик в лице <b><span class="val" id="v_z_fio_consent">Линникова В.Н.</span></b> имеет право прекратить договор...</p>
+        <br><br><br>
+        <div class="no-indent" style="display:flex; justify-content: space-between;">
+            <span>Резидент: ____________________</span>
+            <span>/ <span class="val" id="v_p_init">Линников Ю.В.</span> /</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function update() {
+        const get = (id) => document.getElementById('in_' + id).value;
+        const set = (id, txt) => document.querySelectorAll('#' + id).forEach(el => el.innerText = txt);
+        
+        const zFio = get('z_fio');
+        const pFio = get('p_fio');
+        
+        set('v_num', get('num')); set('v_num_a3', get('num'));
+        set('v_day', get('day'));
+        set('v_month', get('month'));
+        set('v_year', get('year'));
+        
+        set('v_z_fio', zFio); set('v_z_fio_consent', zFio);
+        set('v_p_fio', pFio); set('v_p_fio_consent', pFio);
+        
+        set('v_z_data_sig', get('z_data'));
+        set('v_p_data_sig', get('p_data'));
+        set('v_sum', get('sum'));
+        set('v_sum_txt', get('sum_txt'));
+
+        const short = (s) => {
+            let a = s.split(' ');
+            return a.length >= 3 ? `${a[0]} ${a[1][0]}.${a[2][0]}.` : s;
+        };
+        set('v_z_fio_sig', short(zFio));
+        set('v_p_fio_sig', short(pFio));
+        set('v_p_init', short(pFio));
+    }
+    window.onload = update;
+</script>
+</body>
+</html>
