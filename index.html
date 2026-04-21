@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Договор РЦ Зарождение — Полная версия</title>
+    <title>Договор РЦ Зарождение — Умный Редактор</title>
     <style>
         :root { --sidebar-width: 420px; --bg-color: #2c3e50; --accent: #f1c40f; }
         * { box-sizing: border-box; }
@@ -13,9 +13,15 @@
         .sidebar h2 { font-size: 1rem; color: var(--accent); border-bottom: 1px solid #34495e; padding-bottom: 10px; margin-top: 20px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.75rem; color: #95a5a6; margin-bottom: 5px; text-transform: uppercase; }
-        input, textarea { width: 100%; padding: 10px; background: #34495e; border: 1px solid #2c3e50; color: white; border-radius: 4px; font-family: sans-serif; }
-        .print-btn { width: 100%; padding: 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; transition: 0.3s; }
-        .print-btn:hover { background: #c0392b; }
+        input, textarea, select { width: 100%; padding: 10px; background: #34495e; border: 1px solid #2c3e50; color: white; border-radius: 4px; font-family: sans-serif; outline: none; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+        
+        .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 14px; }
+        .btn-print { background: #e74c3c; color: white; }
+        .btn-print:hover { background: #c0392b; }
+        .btn-word { background: #2980b9; color: white; }
+        .btn-word:hover { background: #1f618d; }
 
         /* ДОКУМЕНТ */
         .preview { margin-left: var(--sidebar-width); padding: 40px; width: calc(100% - var(--sidebar-width)); display: flex; flex-direction: column; align-items: center; }
@@ -45,42 +51,57 @@
 
 <div class="sidebar">
     <h2>1. Договор</h2>
-    <div class="input-group"><label>Номер</label><input type="text" id="in_num" value="315" oninput="sync()"></div>
+    <div class="input-group"><label>Номер</label><input type="text" id="in_num" placeholder="Например: 315" oninput="sync()"></div>
     <div class="input-group">
         <label>Дата (День, Месяц, Год)</label>
         <div style="display:flex; gap:5px;">
-            <input type="text" id="in_day" value="15" oninput="sync()" style="flex:1">
-            <input type="text" id="in_month" value="Апреля" oninput="sync()" style="flex:2">
-            <input type="text" id="in_year" value="2026" oninput="sync()" style="flex:1">
+            <select id="in_day" onchange="sync()" style="flex:1">
+                <option value="" disabled selected>День</option>
+                <script>for(let i=1;i<=31;i++) document.write(`<option value="${i}">${i}</option>`);</script>
+            </select>
+            <select id="in_month" onchange="sync()" style="flex:2">
+                <option value="" disabled selected>Месяц</option>
+                <option value="Января">Января</option><option value="Февраля">Февраля</option><option value="Марта">Марта</option>
+                <option value="Апреля">Апреля</option><option value="Мая">Мая</option><option value="Июня">Июня</option>
+                <option value="Июля">Июля</option><option value="Августа">Августа</option><option value="Сентября">Сентября</option>
+                <option value="Октября">Октября</option><option value="Ноября">Ноября</option><option value="Декабря">Декабря</option>
+            </select>
+            <select id="in_year" onchange="sync()" style="flex:1">
+                <option value="" disabled selected>Год</option>
+                <script>for(let i=2024;i<=2035;i++) document.write(`<option value="${i}">${i}</option>`);</script>
+            </select>
         </div>
     </div>
     
     <h2>2. Заказчик</h2>
-    <div class="input-group"><label>ФИО полностью</label><input type="text" id="in_z_fio" value="Линников Владимир Николаевич" oninput="sync()"></div>
-    <div class="input-group"><label>Паспортные данные и адрес</label><textarea id="in_z_data" rows="4" oninput="sync()">Паспорт: серия 45 01 № 633 096, выдан: РОВД Северное Тушино г. Москвы 14.09.2001, к/п 772-023. Адрес: г. Москва, ул. Окская, д. 28, к. 2, помещ.227</textarea></div>
+    <div class="input-group"><label>ФИО полностью</label><input type="text" id="in_z_fio" placeholder="Фамилия Имя Отчество" oninput="sync()"></div>
+    <div class="input-group"><label>Паспортные данные и адрес</label><textarea id="in_z_data" rows="4" placeholder="Паспорт: серия ... № ..., выдан... Адрес: ..." oninput="sync()"></textarea></div>
 
     <h2>3. Потребитель</h2>
-    <div class="input-group"><label>ФИО полностью</label><input type="text" id="in_p_fio" value="Линников Юрий Владимирович" oninput="sync()"></div>
-    <div class="input-group"><label>Паспортные данные и адрес</label><textarea id="in_p_data" rows="4" oninput="sync()">Паспорт: серия 46 21 № 469 368, выдан: ГУ МВД России по Московской области 03.03.2022, к/п 500-098. Адрес: Московская область, г. Одинцово, тер. СНТ ИКАР -1</textarea></div>
+    <div class="input-group"><label>ФИО полностью</label><input type="text" id="in_p_fio" placeholder="Фамилия Имя Отчество" oninput="sync()"></div>
+    <div class="input-group"><label>Паспортные данные и адрес</label><textarea id="in_p_data" rows="4" placeholder="Паспорт: серия ... № ..., выдан... Адрес: ..." oninput="sync()"></textarea></div>
 
     <h2>4. Стоимость</h2>
-    <div class="input-group"><label>Сумма за 30 дней (числом)</label><input type="text" id="in_sum" value="60 000" oninput="sync()"></div>
-    <div class="input-group"><label>Сумма за 30 дней (прописью)</label><input type="text" id="in_sum_t" value="шестьдесят тысяч" oninput="sync()"></div>
-    <div class="input-group"><label>Сумма за день (числом)</label><input type="text" id="in_day_sum" value="2000" oninput="sync()"></div>
-    <div class="input-group"><label>Сумма за день (прописью)</label><input type="text" id="in_day_sum_t" value="две тысячи" oninput="sync()"></div>
+    <div class="input-group">
+        <label>Сумма за 30 дней (только цифры)</label>
+        <input type="number" id="in_sum" placeholder="Например: 60000" oninput="sync()">
+    </div>
     
-    <button class="print-btn" onclick="window.print()">ПЕЧАТЬ ИЛИ СОХРАНИТЬ В PDF</button>
+    <div class="btn-container">
+        <button class="btn btn-print" onclick="window.print()">ПЕЧАТЬ / СОХРАНИТЬ В PDF</button>
+        <button class="btn btn-word" onclick="exportWord()">СКАЧАТЬ В WORD (.doc)</button>
+    </div>
 </div>
 
-<div class="preview">
+<div class="preview" id="contract-view">
     <div class="page">
-        <div class="center">Договор № <span class="val" id="v_num">315</span><br>на оказание услуг</div>
+        <div class="center">Договор № <span class="val" id="v_num">_______</span><br>на оказание услуг</div>
         <div style="display: flex; justify-content: space-between;" class="no-indent">
             <span>дер. Марьино</span>
-            <span>«<span class="val" id="v_day">15</span>» <span class="val" id="v_month">Апреля</span> <span class="val" id="v_year">2026</span> г.</span>
+            <span>«<span class="val" id="v_day">___</span>» <span class="val" id="v_month">_________</span> <span class="val" id="v_year">20___</span> г.</span>
         </div>
         
-        <p>Общество с ограниченной ответственностью «НОВЫЙ ВЗГЛЯД», именуемое в дальнейшем «Исполнитель», в лице Генерального директора Жукова Дмитрия Вячеславовича, действующего на основании Устава, с одной стороны, и Гражданин РФ <span class="val" id="v_z_fio">Линников Владимир Николаевич</span>, именуемый в дальнейшем «Заказчик», с другой стороны, и Гражданин РФ <span class="val" id="v_p_fio">Линников Юрий Владимирович</span>, именуемый в дальнейшем «Потребитель» с другой стороны, далее совместно именуемые «Стороны», а по отдельности – «Сторона», находясь в здравом уме, осуществляя свои права своей волей, понимая значение и последствия совершаемой сделки, при отсутствии в отношении нас насилия, угроз и принуждения, а также обстоятельств, вынуждающих совершать данную сделку на крайне невыгодных для себя условиях, заключили настоящий договор о нижеследующем:</p>
+        <p>Общество с ограниченной ответственностью «НОВЫЙ ВЗГЛЯД», именуемое в дальнейшем «Исполнитель», в лице Генерального директора Жукова Дмитрия Вячеславовича, действующего на основании Устава, с одной стороны, и Гражданин РФ <span class="val" id="v_z_fio">________________________________________</span>, именуемый в дальнейшем «Заказчик», с другой стороны, и Гражданин РФ <span class="val" id="v_p_fio">________________________________________</span>, именуемый в дальнейшем «Потребитель» с другой стороны, далее совместно именуемые «Стороны», а по отдельности – «Сторона», находясь в здравом уме, осуществляя свои права своей волей, понимая значение и последствия совершаемой сделки, при отсутствии в отношении нас насилия, угроз и принуждения, а также обстоятельств, вынуждающих совершать данную сделку на крайне невыгодных для себя условиях, заключили настоящий договор о нижеследующем:</p>
         
         <div class="center">ОПРЕДЕЛЕНИЯ, ИСПОЛЬЗУЕМЫЕ В ДОГОВОРЕ</div>
         <p>Социальная реабилитация – курс (программа) активного приспособления Потребителя (зависимого) к принятым в обществе правилам и нормам поведения, а также процесс преодоления последствий психологической или моральной травмы, полученной в результате зависимости и ее преодоления, осуществляемая Исполнителем, первоочередной целью которой, является предоставление возможности возвращения к нормальной жизни зависимым людям и членам их семей.</p>
@@ -123,7 +144,7 @@
         <p>3.6. По дополнительному согласованию Сторон Исполнитель оказывает организационную и консультационную помощь при помещении Потребителя в медицинские учреждения, а также при обращении в медицинские учреждения, не связанные с госпитализацией.</p>
 
         <div class="center">4. СТОИМОСТЬ УСЛУГ. ПОРЯДОК РАСЧЕТОВ</div>
-        <p>4.1. Сумма, подлежащая оплате по настоящему Договору, составляет: <span class="val" id="v_sum">60 000</span> (<span class="val" id="v_sum_t">шестьдесят тысяч</span>) рублей 00 копеек за 30 календарных дней из расчета: <span class="val" id="v_day_sum">2000</span> (<span class="val" id="v_day_sum_t">две тысячи</span>) рублей 00 копеек за день пребывания Потребителя в РЦ «Зарождение».</p>
+        <p>4.1. Сумма, подлежащая оплате по настоящему Договору, составляет: <span class="val" id="v_sum_full">_________________________________________</span> за 30 календарных дней из расчета: <span class="val" id="v_day_sum_full">_________________________________________</span> за день пребывания Потребителя в РЦ «Зарождение».</p>
         <p>4.2. Сумма, подлежащая оплате по настоящему Договору, не облагается НДС, так как Исполнитель применяет упрощенную систему налогообложения в соответствии с главой 26.2. Налогового кодекса РФ и Уведомлением о возможности применения упрощенной системы налогообложения.</p>
         <p>4.3. Оплата в размере 100% производится любым из не запрещенных законодательством РФ методом в момент подписания настоящего договора. Оплаты за последующие 30-ти дневные периоды пребывания Потребителя в РЦ «Зарождение», вносятся Заказчиком не позднее последнего рабочего дня оплаченного периода.</p>
         <p>4.4. Стоимость услуг банка при перечислении денежных средств на расчетный счет Исполнителя в стоимость услуг не входит и оплачивается Заказчиком за свой счет.</p>
@@ -178,15 +199,15 @@
             <tr>
                 <td width="33%">
                     <b>Заказчик:</b><br>
-                    Гражданин РФ <span class="val" id="v_z_fio2">Линников Владимир Николаевич</span><br>
-                    <span id="v_z_data">Паспортные данные...</span><br><br><br>
-                    <span id="v_z_init">Линников В.Н.</span> / ______________
+                    Гражданин РФ <span class="val" id="v_z_fio2">_________________________</span><br>
+                    <span id="v_z_data">_________________________<br>_________________________<br>_________________________</span><br><br>
+                    <span id="v_z_init">_________________________</span> / ______________
                 </td>
                 <td width="33%">
                     <b>Потребитель:</b><br>
-                    Гражданин РФ <span class="val" id="v_p_fio2">Линников Юрий Владимирович</span><br>
-                    <span id="v_p_data">Паспортные данные...</span><br><br><br>
-                    <span id="v_p_init">Линников Ю.В.</span> / ______________
+                    Гражданин РФ <span class="val" id="v_p_fio2">_________________________</span><br>
+                    <span id="v_p_data">_________________________<br>_________________________<br>_________________________</span><br><br>
+                    <span id="v_p_init">_________________________</span> / ______________
                 </td>
                 <td width="34%">
                     <b>Исполнитель:</b><br>
@@ -206,7 +227,7 @@
         </table>
         
         <div class="page-break"></div>
-        <div class="right">Приложение №1<br>к Договору № <span class="val" id="v_num2">315</span> от «<span class="val" id="v_day2">15</span>» <span class="val" id="v_month2">Апреля</span> <span class="val" id="v_year2">2026</span> г.</div>
+        <div class="right">Приложение №1<br>к Договору № <span class="val" id="v_num2">_______</span> от «<span class="val" id="v_day2">___</span>» <span class="val" id="v_month2">_________</span> <span class="val" id="v_year2">20___</span> г.</div>
         <div class="center">Описание услуг</div>
         <p>В соответствии с п. 1.2. Договора в процессе оказания услуг Исполнитель осуществляет разработку и реализацию программы социальной реабилитации Потребителя, формирование у Потребителя мотивационных установок, направленных на осознание и преодоление последствий химической зависимости.</p>
         <p>По месту проведения программы социальной реабилитации Исполнитель обеспечивает проведение мероприятий, направленных на:</p>
@@ -222,16 +243,16 @@
         <p>Программа включает в себя мероприятия для членов семьи и близкого окружения Потребителя, являющиеся неотъемлемой частью комплексного и системного подхода.</p>
         <table>
             <tr>
-                <td width="33%">Заказчик:<br><br><span id="v_z_init2">Линников В.Н.</span> / ___________</td>
-                <td width="33%">Потребитель:<br><br><span id="v_p_init2">Линников Ю.В.</span> / ___________</td>
+                <td width="33%">Заказчик:<br><br><span id="v_z_init2">_________________________</span> / ___________</td>
+                <td width="33%">Потребитель:<br><br><span id="v_p_init2">_________________________</span> / ___________</td>
                 <td width="34%">От имени Исполнителя:<br>Генеральный директор ООО «НОВЫЙ ВЗГЛЯД»<br><br>_____________________/Жуков Д.В./<br>М.П.</td>
             </tr>
         </table>
 
         <div class="page-break"></div>
-        <div class="right">Приложение №2<br>к Договору № <span class="val" id="v_num3">315</span> от «<span class="val" id="v_day3">15</span>» <span class="val" id="v_month3">Апреля</span> <span class="val" id="v_year3">2026</span> г.</div>
+        <div class="right">Приложение №2<br>к Договору № <span class="val" id="v_num3">_______</span> от «<span class="val" id="v_day3">___</span>» <span class="val" id="v_month3">_________</span> <span class="val" id="v_year3">20___</span> г.</div>
         <div class="center">ПРАВИЛА ВНУТРЕННЕГО РАСПОРЯДКА<br>для Резидента Реабилитационного центра «Зарождение»</div>
-        <p>Настоящие Правила имеют целью упорядочить организационную сторону взаимоотношений Реабилитационного центра «Зарождение» (далее Организация) и <span class="val" id="v_p_fio3">Линников Юрий Владимирович</span> (далее – Резидент) в сфере оказания услуг, связанных с социальной адаптацией в РЦ «Зарождение».</p>
+        <p>Настоящие Правила имеют целью упорядочить организационную сторону взаимоотношений Реабилитационного центра «Зарождение» (далее Организация) и <span class="val" id="v_p_fio3">________________________________________</span> (далее – Резидент) в сфере оказания услуг, связанных с социальной адаптацией в РЦ «Зарождение».</p>
         <p>Правила внутреннего распорядка для резидентов РЦ «Зарождение» определяют порядок посещения занятий, время приема пищи, режим и условия использования ванны/душа, порядок и место для курения, правила пользования телефонной связью, правила хранения документов, удостоверяющих личность, имеющихся у Резидента при поступлении в РЦ «Зарождение», правила пользования наличными денежными средствами, режим сна, правила внешнего вида и личной гигиены, запрещенные для использования, хранения и применения предметы, вещи и вещества, условия общения с лицами вне РЦ «Зарождение», порядок применения Правил и меры ответственности при их несоблюдении.</p>
         <p>Сама природа терапии химической зависимости требует большой ответственности, как от Резидента, так и от персонала терапевтического сообщества. Ответственность должна создать и поддержать атмосферу, способствующую выздоровлению и облегчающую выздоровление.</p>
         
@@ -265,16 +286,16 @@
         <p>Я согласен с тем, что определенные ограничения необходимы мне для получения максимальной пользы от программы и не расцениваю данные ограничения, как удержание меня в РЦ «Зарождение» против моей воли. Кроме того, я уведомлен, что от меня ожидают помощи и сотрудничества с персоналом в достижении целей моей социальной реабилитации.</p>
         <table>
             <tr>
-                <td width="33%">Заказчик:<br><br><span id="v_z_init3">Линников В.Н.</span> / ___________</td>
-                <td width="33%">Резидент (Потребитель):<br><br><span id="v_p_init3">Линников Ю.В.</span> / ___________</td>
+                <td width="33%">Заказчик:<br><br><span id="v_z_init3">_________________________</span> / ___________</td>
+                <td width="33%">Резидент (Потребитель):<br><br><span id="v_p_init3">_________________________</span> / ___________</td>
                 <td width="34%">От имени Исполнителя:<br>Генеральный директор ООО «НОВЫЙ ВЗГЛЯД»<br><br>_____________________/Жуков Д.В./<br>М.П.</td>
             </tr>
         </table>
 
         <div class="page-break"></div>
-        <div class="right">Приложение №3<br>к Договору № <span class="val" id="v_num4">315</span> от «<span class="val" id="v_day4">15</span>» <span class="val" id="v_month4">Апреля</span> <span class="val" id="v_year4">2026</span> г.</div>
+        <div class="right">Приложение №3<br>к Договору № <span class="val" id="v_num4">_______</span> от «<span class="val" id="v_day4">___</span>» <span class="val" id="v_month4">_________</span> <span class="val" id="v_year4">20___</span> г.</div>
         <div class="center">ДОБРОВОЛЬНОЕ СОГЛАСИЕ<br>на временное ограничение моих прав и свобод в связи с исполнением договора<br>о социальной реабилитации (реабилитации)</div>
-        <p>Я, <span class="val" id="v_p_fio4">Линников Юрий Владимирович</span> (ФИО), в целях исполнения заключенного мной договора о моей социальной реабилитации (реабилитации) добровольно соглашаюсь на временное ограничение следующих моих прав и свобод:</p>
+        <p>Я, <span class="val" id="v_p_fio4">________________________________________</span> (ФИО), в целях исполнения заключенного мной договора о моей социальной реабилитации (реабилитации) добровольно соглашаюсь на временное ограничение следующих моих прав и свобод:</p>
         <p class="no-indent">1) свободу передвижения;</p>
         <p class="no-indent">2) право на тайну переписки, телефонных переговоров, почтовых, телеграфных и иных сообщений;</p>
         <p class="no-indent">3) право на выбор места пребывания;</p>
@@ -299,7 +320,7 @@
         <p class="no-indent">- применение мер принуждения, воздействия, стимулирования и мотивации, связанных с любыми ограничениями моих прав и свобод по усмотрению РЦ «Зарождение»;</p>
         <p class="no-indent">- за исключением случаев, когда действия РЦ «Зарождение» прямо и непосредственно ведет к нарушению моих прав на жизнь, здоровье и личную неприкосновенность.</p>
         <p>Мне известно, что я имею право заявить о прекращении действия договора о социальной реабилитации, что влечет за собой прекращение действия настоящего согласия.</p>
-        <p>Мне известно, что Заказчик в лице <span class="val" id="v_z_fio4">Линников Владимир Николаевич</span> по договору о социальной реабилитации (реабилитации) имеет право заявить о прекращении действия договора о социальной реабилитации, что влечет за собой прекращение действия настоящего согласия.</p>
+        <p>Мне известно, что Заказчик в лице <span class="val" id="v_z_fio4">________________________________________</span> по договору о социальной реабилитации (реабилитации) имеет право заявить о прекращении действия договора о социальной реабилитации, что влечет за собой прекращение действия настоящего согласия.</p>
         <p>Настоящее согласие является добровольным, дано мной в здравом уме и трезвой памяти, я на момент дачи согласия являюсь дееспособным. Дача мной настоящего согласия не обусловлена стечением крайне тяжелых жизненных обстоятельств.</p>
         <p>Я заявляю о согласии с тем, что временные ограничения моих прав и свобод являются необходимым и обязательным элементом моей социальной реабилитации, ограничения моих прав и свобод не являются крайне невыгодными условиями, на которые я вынужден был согласиться, они обусловлены целями моей социальной реабилитации и допускаются мной в этих целях.</p>
         <p>Правила внутреннего распорядка РЦ «Зарождение», распорядок дня были доведены до меня в доступной форме, понятны мне. Я согласен с соблюдением установленных в РЦ «Зарождение» распорядка дня, правила внутреннего распорядка и обязуюсь соблюдать их, равно как и иные правила, ограничения, запреты, которые могут быть доведены до меня позднее.</p>
@@ -308,42 +329,104 @@
         <table>
             <tr>
                 <td style="border: none;">Резидент (Потребитель):</td>
-                <td style="border: none; text-align: right;"><span id="v_p_init4">Линников Ю.В.</span> /______________</td>
+                <td style="border: none; text-align: right;"><span id="v_p_init4">_________________________</span> /______________</td>
             </tr>
         </table>
     </div>
 </div>
 
 <script>
+    // --- Логика конвертации чисел в текст (рубли) ---
+    function numberToWords(num) {
+        if (!num || isNaN(num) || num === 0) return '';
+        const units = ['', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+        const units_m = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+        const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
+        const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
+        const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
+        
+        function getWords(n, isFemale) {
+            let res = '';
+            let h = Math.floor(n / 100);
+            let t = Math.floor((n % 100) / 10);
+            let u = n % 10;
+            if (h > 0) res += hundreds[h] + ' ';
+            if (t === 1) res += teens[u] + ' ';
+            else {
+                if (t > 1) res += tens[t] + ' ';
+                if (u > 0) res += (isFemale ? units[u] : units_m[u]) + ' ';
+            }
+            return res.trim();
+        }
+        
+        let res = '';
+        let thousands = Math.floor((num % 1000000) / 1000);
+        let ones = num % 1000;
+        
+        if (thousands > 0) {
+            let t_txt = getWords(thousands, true);
+            let rem = thousands % 100;
+            let rem10 = rem % 10;
+            let word = 'тысяч';
+            if (rem > 10 && rem < 20) word = 'тысяч';
+            else if (rem10 === 1) word = 'тысяча';
+            else if (rem10 >= 2 && rem10 <= 4) word = 'тысячи';
+            res += t_txt + ' ' + word + ' ';
+        }
+        if (ones > 0) res += getWords(ones, false);
+        return res.trim();
+    }
+
+    // --- Основная функция синхронизации полей ---
     function sync() {
-        const get = (id) => document.getElementById('in_' + id).value;
-        const set = (id, text) => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = text;
+        const get = (id) => { const el = document.getElementById('in_' + id); return el ? el.value.trim() : ''; };
+        const set = (id, text, defaultPlaceholder) => {
+            document.querySelectorAll('#' + id).forEach(el => {
+                el.innerText = text ? text : defaultPlaceholder;
+                if(text) el.classList.remove('empty'); else el.classList.add('empty');
+            });
         };
 
         const num = get('num');
         const d = get('day'), m = get('month'), y = get('year');
         const zFio = get('z_fio'), pFio = get('p_fio');
 
-        ['v_num', 'v_num2', 'v_num3', 'v_num4'].forEach(id => set(id, num));
-        ['v_day', 'v_day2', 'v_day3', 'v_day4'].forEach(id => set(id, d));
-        ['v_month', 'v_month2', 'v_month3', 'v_month4'].forEach(id => set(id, m));
-        ['v_year', 'v_year2', 'v_year3', 'v_year4'].forEach(id => set(id, y));
+        ['v_num', 'v_num2', 'v_num3', 'v_num4'].forEach(id => set(id, num, '_______'));
+        ['v_day', 'v_day2', 'v_day3', 'v_day4'].forEach(id => set(id, d, '___'));
+        ['v_month', 'v_month2', 'v_month3', 'v_month4'].forEach(id => set(id, m, '_________'));
+        ['v_year', 'v_year2', 'v_year3', 'v_year4'].forEach(id => set(id, y, '20___'));
 
-        ['v_z_fio', 'v_z_fio2', 'v_z_fio4'].forEach(id => set(id, zFio));
-        ['v_p_fio', 'v_p_fio2', 'v_p_fio3', 'v_p_fio4'].forEach(id => set(id, pFio));
+        const line = '________________________________________';
+        ['v_z_fio', 'v_z_fio2', 'v_z_fio4'].forEach(id => set(id, zFio, line));
+        ['v_p_fio', 'v_p_fio2', 'v_p_fio3', 'v_p_fio4'].forEach(id => set(id, pFio, line));
 
-        set('v_z_data', get('z_data'));
-        set('v_p_data', get('p_data'));
+        const multiline = '_________________________\n_________________________\n_________________________';
+        set('v_z_data', get('z_data'), multiline);
+        set('v_p_data', get('p_data'), multiline);
         
-        set('v_sum', get('sum'));
-        set('v_sum_t', get('sum_t'));
-        set('v_day_sum', get('day_sum'));
-        set('v_day_sum_t', get('day_sum_t'));
+        // Математика сумм
+        let sumInput = get('sum');
+        let fullSumText = '_________________________________________';
+        let daySumText = '_________________________________________';
 
-        // Создаем инициалы для подписей: Иванов Иван Иванович -> Иванов И.И.
+        if(sumInput && !isNaN(sumInput)) {
+            let sumInt = parseInt(sumInput);
+            let sumFmt = sumInt.toLocaleString('ru-RU'); // 60 000
+            let sumWords = numberToWords(sumInt);
+            fullSumText = ` ${sumFmt} (${sumWords}) рублей 00 копеек `;
+
+            let daySumInt = Math.round(sumInt / 30);
+            let daySumFmt = daySumInt.toLocaleString('ru-RU');
+            let daySumWords = numberToWords(daySumInt);
+            daySumText = ` ${daySumFmt} (${daySumWords}) рублей 00 копеек `;
+        }
+
+        set('v_sum_full', fullSumText, '_________________________________________');
+        set('v_day_sum_full', daySumText, '_________________________________________');
+
+        // Инициалы (Иванов И.И.)
         const makeInitials = (name) => {
+            if(!name) return null;
             const parts = name.trim().split(/\s+/);
             if(parts.length >= 3) return `${parts[0]} ${parts[1][0]}.${parts[2][0]}.`;
             return name;
@@ -352,12 +435,9 @@
         const zInit = makeInitials(zFio);
         const pInit = makeInitials(pFio);
 
-        ['v_z_init', 'v_z_init2', 'v_z_init3'].forEach(id => set(id, zInit));
-        ['v_p_init', 'v_p_init2', 'v_p_init3', 'v_p_init4'].forEach(id => set(id, pInit));
+        ['v_z_init', 'v_z_init2', 'v_z_init3'].forEach(id => set(id, zInit, '_________________________'));
+        ['v_p_init', 'v_p_init2', 'v_p_init3', 'v_p_init4'].forEach(id => set(id, pInit, '_________________________'));
     }
-    
-    // Запускаем синхронизацию при загрузке страницы
-    window.onload = sync;
-</script>
-</body>
-</html>
+
+    // --- Экспорт в Word (.doc) ---
+    function
